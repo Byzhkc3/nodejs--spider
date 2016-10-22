@@ -12,4 +12,16 @@ exports.save = function (document) {
             db.close();
         });
     });
-}
+};
+
+exports.getUser = function (username, callback) {
+    MongoClient.connect(url, function (err, db) {
+        assert.equal(err, null);
+        var collection = db.collection('user');
+        collection.findOne({ name: username }, function (err, result) {
+            assert.equal(err, null);
+            callback(result);
+            db.close();
+        });
+    });
+};
