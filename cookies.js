@@ -21,5 +21,10 @@ exports.getCookie = function (callback) {
         }
         var $ = cheerio(data, { decodeEntities: false });
         var csrf = $("input[name='csrfmiddlewaretoken']").val();
+        if (!csrf){
+            console.log('csrfmiddlewaretoken not found');
+            return;
+        }
+        return csrf;
     });
 }
