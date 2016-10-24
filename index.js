@@ -1,31 +1,26 @@
 var db = require("./db");
 var tools = require("./tools");
 var config = require('./config');
+    console.log(config['username']);
 var superagent = require("superagent");
 var cheerio = require('cheerio');
+var request = require("request");
 
 var usercookie = null;
 
-function main() {
-    cookies.getCookie
-}
 
 function getloginCookie() {
-    superagent.post()
-}
-
-function getCsrf(callback) {
-    tools.get(config.url, usercookie.cookie, function (err, data) {
+    var auth = {
+        'username' : config.username,
+        'password' : config.password,
+        'csrfmiddlewaretoken' : getCsrf
+    };
+    console.log(auth);
+    request.post('https://www.shanbay.com/accounts/login/', null, auth, function (err, data) {
         if (err) {
-            console.log('Get cookie error');
+            console.log('Post error');
             return;
         }
-        var $ = cheerio(data, { decodeEntities: false });
-        var csrf = $("input[name='csrfmiddlewaretoken']").val();
-        if (!csrf) {
-            console.log('csrfmiddlewaretoken not found');
-            return;
-        }
-        return csrf;
-    });
+        var $ = cheerio.load(data, { decodeEntities: false });
+    })
 }

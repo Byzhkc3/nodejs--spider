@@ -1,9 +1,11 @@
 var request = require("request");
 var zlib = require("zlib");
 
+var cookie = null;
+
 var headersGet = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'Accept-Encoding': 'gzip, deflate, sdch, br',
+    'Accept-Encoding': 'gzip, deflate',
     'Accept-Language': 'zh-CN,zh;q=0.8',
     'Cache-Control': 'max-age=0',
     'Connection': 'keep-alive',
@@ -12,13 +14,12 @@ var headersGet = {
 };
 var headersPost = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Encoding': 'gzip, deflate',
     'Accept-Language': 'zh-CN,zh;q=0.8',
     'Cache-Control': 'max-age=0',
     'Connection': 'keep-alive',
     'Content-Type': 'application/x-www-form-urlencoded',
     'Cookie': cookie,
-    'Upgrade-Insecure-Requests': 1,
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/53.0.2785.143 Chrome/53.0.2785.143 Safari/537.36'
 }
 
@@ -29,9 +30,9 @@ exports.get = function (url, cookie, callback) {
         timeout: 30000,
         encoding: null
     }, function (err, response, data) {
-        if (!error && response.statusCode == 200) {
+        if (!err && response.statusCode == 200) {
             var buffer = Buffer.from(data);
-            var encoding = response.headers['Content-Encoding'];
+            var encoding = response.headers['content-encoding'];
             if (encoding == 'gzip') {
                 zlib.gunzip(buffer, function (err, decode) {
                     callback(err && console.log('unzip err: ' + err), decode && decode.toString());
@@ -49,17 +50,18 @@ exports.get = function (url, cookie, callback) {
     });
 };
 
-exports.post = function (url, cookie, body, callback) {
+exports.post = function (url, cookie, auth, callback) {
     request.post({
         url: url,
         headers: headersPost,
         timeout: 30000,
         encoding: null,
-        body: body
+        auth: auth
     }, function (err, response, data) {
-        if (!error && response.statusCode == 200) {
+        if (!err && response.statusCode == 200) {
             var buffer = Buffer.from(data);
-            var encoding = response.headers['Content-Encoding'];
+            var encoding = response.headers['content-encoding'];
+            consolelog(response.headers);
             if (encoding == 'gzip') {
                 zlib.gunzip(buffer, function (err, decode) {
                     callback(err && console.log('unzip err: ' + err), decode && decode.toString());
@@ -76,3 +78,16 @@ exports.post = function (url, cookie, body, callback) {
         }
     });
 };
+
+exports.getCsrf = function (url) {
+    request.get({
+        url: url,
+        headers: headersGet,
+        timeout: 30000,
+        encoding: null
+    }, function (err, response, data) {
+        if (!err && response.statusCode == 200) {
+            return response.headers['set-cookie']
+        }
+    })
+}
