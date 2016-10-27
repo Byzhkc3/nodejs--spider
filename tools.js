@@ -61,7 +61,6 @@ exports.post = function (url, cookie, auth, callback) {
         if (!err && response.statusCode == 200) {
             var buffer = Buffer.from(data);
             var encoding = response.headers['content-encoding'];
-            consolelog(response.headers);
             if (encoding == 'gzip') {
                 zlib.gunzip(buffer, function (err, decode) {
                     callback(err && console.log('unzip err: ' + err), decode && decode.toString());
@@ -78,16 +77,3 @@ exports.post = function (url, cookie, auth, callback) {
         }
     });
 };
-
-exports.getCsrf = function (url) {
-    request.get({
-        url: url,
-        headers: headersGet,
-        timeout: 30000,
-        encoding: null
-    }, function (err, response, data) {
-        if (!err && response.statusCode == 200) {
-            return response.headers['set-cookie']
-        }
-    })
-}
