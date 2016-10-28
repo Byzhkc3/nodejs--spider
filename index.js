@@ -5,9 +5,10 @@ var cheerio = require("cheerio");
 var request = require("request");
 
 var usercookie = null;
+var postUrl = config.postUrl;
 
 function getloginCookie() {
-    tools.get('https://www.shanbay.com/accounts/login/', null, function (err, data) {
+    tools.get(postUrl, null, function (err, data) {
         if (err) {
             console.log('err');
             return;
@@ -20,12 +21,13 @@ function getloginCookie() {
             'csrfmiddlewaretoken': csrf
         };
         console.log(auth);
-        tools.post('https://www.shanbay.com/accounts/login/', null, auth, function (err, data) {
+        tools.postFrom(postUrl, auth, function (err, response, data) {
             if (err) {
                 console.log(err);
                 return;
             }
             var $ = cheerio.load(data);
+            console.log(auth);
         })
     });
 

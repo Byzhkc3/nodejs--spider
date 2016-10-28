@@ -77,3 +77,31 @@ exports.post = function (url, cookie, auth, callback) {
         }
     });
 };
+
+exports.postFrom = function (url, auth, callback) {
+    request.post({
+        url: url,
+        headers: headersPost,
+        timeout: 30000,
+        encoding: null,
+        form: auth
+    }, function (err, response, data) {
+        if (!err && response.statusCode == 200) {
+            var buffer = Buffer.from(data);
+            var encoding = response.headers['content-encoding'];
+            if (encoding == 'gzip') {
+                zlib.gunzip(buffer, function (err, decode) {
+                    callback(err && console.log('unzip err: ' + err), decode && decode.toString());
+                });
+            } else if (encoding == 'deflate') {
+                zlib.inflate(buffer, function (err, decode) {
+                    callback(err && console.log('deflate err' + err), decode && decode.toString());
+                });
+            } else {
+                callback(null, buffer.toString());
+            }
+        } else {
+            callback(err || response.statusCode);
+        }
+    });
+};
