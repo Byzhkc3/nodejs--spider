@@ -16,12 +16,11 @@ function getloginCookie() {
         var $ = cheerio.load(data);
         var csrf = $('#login-form-tmpl').html().match(/value='\w{32}'/)[0].slice(7, -1);
         var auth = {
-            'username': config.username,
-            'password': config.password,
-            'csrfmiddlewaretoken': csrf
+            username: config.username,
+            password: config.password,
+            csrfmiddlewaretoken: csrf
         };
-        console.log(auth);
-        tools.postFrom(postUrl, auth, function (err, response, data) {
+        tools.postFrom(postUrl, csrf, auth, function (err, response, data) {
             if (err) {
                 console.log(err);
                 return;
