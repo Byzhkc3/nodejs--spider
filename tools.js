@@ -90,20 +90,10 @@ exports.postFrom = function (url, csrf, auth, callback) {
         form: auth,
         jar: j
     }, function (err, response, data) {
-        if (!err && response.statusCode == 200) {
+        if (!err && response.statusCode == 302) {
             var buffer = Buffer.from(data);
-            var encoding = response.headers['content-encoding'];
-            if (encoding == 'gzip') {
-                zlib.gunzip(buffer, function (err, decode) {
-                    callback(err && console.log('unzip err: ' + err), decode && decode.toString());
-                });
-            } else if (encoding == 'deflate') {
-                zlib.inflate(buffer, function (err, decode) {
-                    callback(err && console.log('deflate err' + err), decode && decode.toString());
-                });
-            } else {
-                callback(null, buffer.toString());
-            }
+            var encoding = response.headers['set-cookie'];
+            callback(null, encoding)
         } else {
             callback(err || response.statusCode);
         }

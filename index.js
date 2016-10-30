@@ -10,7 +10,7 @@ var postUrl = config.postUrl;
 function getloginCookie() {
     tools.get(postUrl, null, function (err, data) {
         if (err) {
-            console.log('err');
+            console.log(err);
             return;
         }
         var $ = cheerio.load(data);
@@ -20,13 +20,12 @@ function getloginCookie() {
             password: config.password,
             csrfmiddlewaretoken: csrf
         };
-        tools.postFrom(postUrl, csrf, auth, function (err, response, data) {
+        tools.postFrom(postUrl, csrf, auth, function (err, data) {
             if (err) {
                 console.log(err);
                 return;
             }
-            var $ = cheerio.load(data);
-            console.log(auth);
+            console.log(data);
         })
     });
 
