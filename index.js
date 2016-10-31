@@ -4,11 +4,24 @@ var config = require("./config");
 var cheerio = require("cheerio");
 var request = require("request");
 
-var usercookie = null;
+var usercookie = '';
 var postUrl = config.postUrl;
+var bookUrl = config.bookUrl;
 
-function getloginCookie() {
-    tools.get(postUrl, null, function (err, data) {
+function getData() {
+    getloginCookie(function (data) {
+        data.forEach(function (element) {
+            usercookie = usercookie + element.match(/\S*=\S*;/);
+        });
+        console.log(usercookie);
+        tools.get('https://www.shanbay.com/wordbook/books/mine/', usercookie, function (err, data) {
+            // console.log(data);
+        })
+    })
+}
+
+function getloginCookie(callback) {
+    tools.get(postUrl, usercookie, function (err, data) {
         if (err) {
             console.log(err);
             return;
@@ -25,9 +38,9 @@ function getloginCookie() {
                 console.log(err);
                 return;
             }
-            console.log(data);
+            callback(data);
         })
     });
 
 }
-getloginCookie();
+getData();
