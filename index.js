@@ -8,18 +8,6 @@ var usercookie = '';
 var postUrl = config.postUrl;
 var bookUrl = config.bookUrl;
 
-function getData() {
-    getloginCookie(function (data) {
-        data.forEach(function (element) {
-            usercookie = usercookie + element.match(/\S*=\S*;/);
-        });
-        console.log(usercookie);
-        tools.get('https://www.shanbay.com/wordbook/books/mine/', usercookie, function (err, data) {
-            // console.log(data);
-        })
-    })
-}
-
 function getloginCookie(callback) {
     tools.get(postUrl, usercookie, function (err, data) {
         if (err) {
@@ -38,9 +26,45 @@ function getloginCookie(callback) {
                 console.log(err);
                 return;
             }
-            callback(data);
+            data.forEach(function (element) {
+                usercookie = usercookie + element.match(/\S*=\S*;/);
+            });
+            tools.get('https://www.shanbay.com/wordbook/books/mine/', usercookie, function (err, data) {
+                console.log(data);
+            })
         })
     });
 
 }
+function getData() {
+    tools.get(bookUrl, usercookie, function (err, data) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        var dataUrl = [];
+        var $ = cheerio.load(data);
+        var list = $('.wordbook-wordlist-name').find('a');
+        list.each(function (i, elem) {
+            dataUrl.push(list[i].attribs.href);
+        });
+        dataUrl.shift();
+        dataUrl.forEach(function (element, index, array) {
+            var url = 'https://www.shanbay.com' + array[index];
+            tools.get(url, usercookie, function (err, data) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                var $ = cheerio.load(data,{ decodeEntities: false });
+                
+                var worlds = $('.row .span10').html();
+                console.log(worlds);
+                
+            })
+        })
+
+    })
+}
+
 getData();
