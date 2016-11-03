@@ -42,31 +42,42 @@ function getData() {
             console.log(err);
             return;
         }
-        var dataUrl = [];
+        var wordBookList = [];
+        var wordBookPage = [];
         var $ = cheerio.load(data);
         var list = $('.wordbook-wordlist-name').find('a');
         list.each(function (i, elem) {
-            dataUrl.push(list[i].attribs.href);
+            wordBookList.push(list[i].attribs.href);
         });
-        dataUrl.shift();
-        dataUrl.forEach(function (element, index, array) {
-            var url = 'https://www.shanbay.com' + element;
-            tools.get(url, usercookie, function (err, data) {
+        wordBookList.shift();
+        wordBookList.forEach(function (element, index, array) {
+            for (var i = 1; i < 11; i++) {
+                wordBookPage.push('https://www.shanbay.com' + element + '?page=' + i);
+            }
+        });
+        setTimeout(function () {
+            tools.get(wordBookPage[152], usercookie, function (err, data) {
                 if (err) {
                     console.log(err);
                     return;
                 }
-                parseData(data);
+                var $ = cheerio.load(data, { decodeEntities: false });
+
+                var worlds = $('.table-striped').find('.span2 strong').html() + ':' + $('.table-striped').find('.span10').html();
+                console.log(worlds);
             })
-        })
+        }, 2000)
 
     })
 }
-function parseData(data) {
+
+tools.get('https://www.shanbay.com/wordlist/23/63337/?page=2', usercookie, function (err, data) {
+    if (err) {
+        console.log(err);
+        return;
+    }
     var $ = cheerio.load(data, { decodeEntities: false });
 
-    var worlds = $('.table-striped').find('.span2 strong').html() + ':' + $('.table-striped').find('.span10').html();
+    var worlds = $('table').html();
     console.log(worlds);
-}
-
-getData();
+});
