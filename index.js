@@ -50,21 +50,23 @@ function getData() {
         });
         dataUrl.shift();
         dataUrl.forEach(function (element, index, array) {
-            var url = 'https://www.shanbay.com' + array[index];
+            var url = 'https://www.shanbay.com' + element;
             tools.get(url, usercookie, function (err, data) {
                 if (err) {
                     console.log(err);
                     return;
                 }
-                var $ = cheerio.load(data,{ decodeEntities: false });
-                
-                var worlds = $('.row .span10').html();
-                console.log(worlds);
-                
+                parseData(data);
             })
         })
 
     })
+}
+function parseData(data) {
+    var $ = cheerio.load(data, { decodeEntities: false });
+
+    var worlds = $('.table-striped').find('.span2 strong').html() + ':' + $('.table-striped').find('.span10').html();
+    console.log(worlds);
 }
 
 getData();
