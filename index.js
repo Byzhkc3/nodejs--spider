@@ -45,9 +45,9 @@ function getData() {
         var wordBookList = [];
         var wordBookPage = [];
         var $ = cheerio.load(data);
-        var list = $('.wordbook-wordlist-name').find('a');
-        list.each(function (i, elem) {
-            wordBookList.push(list[i].attribs.href);
+        var aList = $('.wordbook-wordlist-name').find('a');
+        aList.each(function (i, elem) {
+            wordBookList.push(aList[i].attribs.href);
         });
         wordBookList.shift();
         wordBookList.forEach(function (element, index, array) {
@@ -55,29 +55,36 @@ function getData() {
                 wordBookPage.push('https://www.shanbay.com' + element + '?page=' + i);
             }
         });
-        setTimeout(function () {
-            tools.get(wordBookPage[152], usercookie, function (err, data) {
+        for (var j = 0; j < 10; j++) {
+            console.log(wordBookPage[j]);
+            tools.get(wordBookPage[j], usercookie, function (err, data) {
                 if (err) {
                     console.log(err);
                     return;
                 }
-                var $ = cheerio.load(data, { decodeEntities: false });
-
-                var worlds = $('.table-striped').find('.span2 strong').html() + ':' + $('.table-striped').find('.span10').html();
-                console.log(worlds);
-            })
-        }, 2000)
+                var $2 = cheerio.load(data, { decodeEntities: false });
+                var worldList = '';
+                var words = $2('.span2').children();
+                var mean = $2('.span10');
+                var listLength = $2('.span2').children().length;
+                for (var z = 0; z < listLength; z++) {
+                    worldList = words[z].children[0].data + ':' + mean[z].children[0].data
+                    console.log(worldList);
+                }
+            });
+            interval(5000);
+        }
 
     })
 }
+getData();
 
-tools.get('https://www.shanbay.com/wordlist/23/63337/?page=2', usercookie, function (err, data) {
-    if (err) {
-        console.log(err);
-        return;
+function interval(n) {
+    var start = new Date().getTime();
+    while (true) {
+        var time = new Date().getTime();
+        if (time - start > n) {
+            break;
+        }
     }
-    var $ = cheerio.load(data, { decodeEntities: false });
-
-    var worlds = $('table').html();
-    console.log(worlds);
-});
+};
