@@ -8,7 +8,7 @@ var usercookie = '';
 var postUrl = config.postUrl;
 var bookUrl = config.bookUrl;
 
-function getloginCookie(callback) {
+function getloginCookie() {
     tools.get(postUrl, usercookie, function (err, data) {
         if (err) {
             console.log(err);
@@ -21,6 +21,7 @@ function getloginCookie(callback) {
             password: config.password,
             csrfmiddlewaretoken: csrf
         };
+        console.log(auth);
         tools.postFrom(postUrl, csrf, auth, function (err, data) {
             if (err) {
                 console.log(err);
@@ -30,12 +31,13 @@ function getloginCookie(callback) {
                 usercookie = usercookie + element.match(/\S*=\S*;/);
             });
             tools.get('https://www.shanbay.com/wordbook/books/mine/', usercookie, function (err, data) {
-                console.log(data);
+
             })
         })
     });
 
 }
+getloginCookie();
 function getData() {
     tools.get(bookUrl, usercookie, function (err, data) {
         if (err) {
@@ -55,8 +57,8 @@ function getData() {
                 wordBookPage.push('https://www.shanbay.com' + element + '?page=' + i);
             }
         });
-        for (var j = 0; j < 10; j++) {
-            console.log(wordBookPage[j]);
+        var wordBookPageLength = wordBookPage.length;
+        for (var j = 0; j < wordBookPageLength; j++) {
             tools.get(wordBookPage[j], usercookie, function (err, data) {
                 if (err) {
                     console.log(err);
@@ -72,12 +74,11 @@ function getData() {
                     console.log(worldList);
                 }
             });
-            interval(5000);
+            interval(3500);
         }
 
     })
 }
-getData();
 
 function interval(n) {
     var start = new Date().getTime();
