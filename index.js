@@ -2,14 +2,13 @@ var db = require("./db");
 var tools = require("./tools");
 var config = require("./config");
 var cheerio = require("cheerio");
-var request = require("request");
 
-var usercookie = '';
 var postUrl = config.postUrl;
 var bookUrl = config.bookUrl;
+var mineBookUrl = config.mineBookUrl;
 
 function getloginCookie() {
-    tools.get(postUrl, usercookie, function (err, data) {
+    tools.get(postUrl, function (err, data) {
         if (err) {
             console.log(err);
             return;
@@ -21,17 +20,13 @@ function getloginCookie() {
             password: config.password,
             csrfmiddlewaretoken: csrf
         };
-        console.log(auth);
-        tools.postFrom(postUrl, csrf, auth, function (err, data) {
+        tools.postFrom(postUrl, auth, function (err, data) {
             if (err) {
                 console.log(err);
                 return;
             }
-            data.forEach(function (element) {
-                usercookie = usercookie + element.match(/\S*=\S*;/);
-            });
-            tools.get('https://www.shanbay.com/wordbook/books/mine/', usercookie, function (err, data) {
-
+            tools.get(mineBookUrl, function (err, data) {
+                console.log(data);
             })
         })
     });
@@ -39,7 +34,7 @@ function getloginCookie() {
 }
 getloginCookie();
 function getData() {
-    tools.get(bookUrl, usercookie, function (err, data) {
+    tools.get(bookUrl, function (err, data) {
         if (err) {
             console.log(err);
             return;

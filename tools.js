@@ -1,4 +1,4 @@
-var request = require("request");
+var request = require("request").defaults({ jar: true });
 var zlib = require("zlib");
 
 var headersGet = {
@@ -20,16 +20,12 @@ var headersPost = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/53.0.2785.143 Chrome/53.0.2785.143 Safari/537.36'
 }
 
-exports.get = function (url, cookie, callback) {
-    var j = request.jar();
-    var cookie = request.cookie(cookie);
-    j.setCookie(cookie, url);
+exports.get = function (url, callback) {
     request.get({
         url: url,
         headers: headersGet,
         timeout: 30000,
-        encoding: null,
-        jar: j
+        encoding: null
     }, function (err, response, data) {
         if (!err && response.statusCode == 200) {
             var buffer = Buffer.from(data);
@@ -52,18 +48,13 @@ exports.get = function (url, cookie, callback) {
 };
 
 
-exports.postFrom = function (url, csrf, auth, callback) {
-    var csrftokenCookie = 'csrftoken=' + csrf;
-    var j = request.jar();
-    var cookie = request.cookie(csrftokenCookie);
-    j.setCookie(cookie, url);
+exports.postFrom = function (url, auth, callback) {
     request.post({
         url: url,
         headers: headersPost,
         timeout: 30000,
         encoding: null,
-        form: auth,
-        jar: j
+        form: auth
     }, function (err, response, data) {
         if (!err && response.statusCode == 302) {
             var buffer = Buffer.from(data);
