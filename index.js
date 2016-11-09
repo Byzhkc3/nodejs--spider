@@ -2,9 +2,9 @@ var db = require("./db");
 var tools = require("./tools");
 var config = require("./config");
 var cheerio = require("cheerio");
+var fs = require('fs');
 
 var postUrl = config.postUrl;
-var bookUrl = config.bookUrl;
 var mineBookUrl = config.mineBookUrl;
 
 function getloginCookie() {
@@ -26,14 +26,16 @@ function getloginCookie() {
                 return;
             }
             tools.get(mineBookUrl, function (err, data) {
-                console.log(data);
+                var $ = cheerio.load(data);
+                var bookListUrl = $('.wordbook-title').find('a')[0].attribs.href;
+                getData('https://www.shanbay.com' + bookListUrl);
             })
         })
     });
 
 }
 getloginCookie();
-function getData() {
+function getData(bookUrl) {
     tools.get(bookUrl, function (err, data) {
         if (err) {
             console.log(err);
@@ -53,8 +55,8 @@ function getData() {
             }
         });
         var wordBookPageLength = wordBookPage.length;
-        for (var j = 0; j < wordBookPageLength; j++) {
-            tools.get(wordBookPage[j], usercookie, function (err, data) {
+        for (var j = 0; j < 10; j++) {
+            tools.get(wordBookPage[j], function (err, data) {
                 if (err) {
                     console.log(err);
                     return;
@@ -66,7 +68,10 @@ function getData() {
                 var listLength = $2('.span2').children().length;
                 for (var z = 0; z < listLength; z++) {
                     worldList = words[z].children[0].data + ':' + mean[z].children[0].data
-                    console.log(worldList);
+                    fs.writeFile('word.txt', worldList, 'utf8', (err) => {
+                        if (err) throw err;
+                        console.log('Success !');
+                    });
                 }
             });
             interval(3500);
