@@ -43,6 +43,7 @@ function getData(bookUrl) {
         }
         var wordBookList = [];
         var wordBookPage = [];
+        var worldList = '';
         var $ = cheerio.load(data);
         var aList = $('.wordbook-wordlist-name').find('a');
         aList.each(function (i, elem) {
@@ -55,28 +56,28 @@ function getData(bookUrl) {
             }
         });
         var wordBookPageLength = wordBookPage.length;
-        for (var j = 0; j < 10; j++) {
+        for (var j = 0; j < 1; j++) {
             tools.get(wordBookPage[j], function (err, data) {
                 if (err) {
                     console.log(err);
                     return;
                 }
                 var $2 = cheerio.load(data, { decodeEntities: false });
-                var worldList = '';
                 var words = $2('.span2').children();
                 var mean = $2('.span10');
                 var listLength = $2('.span2').children().length;
                 for (var z = 0; z < listLength; z++) {
                     worldList = words[z].children[0].data + ':' + mean[z].children[0].data
-                    fs.writeFile('word.txt', worldList, 'utf8', (err) => {
+                    worldList = worldList.replace(/\n/g, '') + '\r\n';
+                    fs.appendFile('word', worldList, 'utf8', function (err) {
                         if (err) throw err;
-                        console.log('Success !');
+
                     });
                 }
             });
             interval(3500);
         }
-
+        console.log('Success !');
     })
 }
 
