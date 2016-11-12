@@ -34,7 +34,7 @@ function getloginCookie() {
     });
 
 }
-getloginCookie();
+
 function getData(bookUrl) {
     tools.get(bookUrl, function (err, data) {
         if (err) {
@@ -67,12 +67,14 @@ function getData(bookUrl) {
                 var mean = $2('.span10');
                 var listLength = $2('.span2').children().length;
                 for (var z = 0; z < listLength; z++) {
-                    worldList = words[z].children[0].data + ':' + mean[z].children[0].data
-                    worldList = worldList.replace(/\n/g, '') + '\r\n';
-                    fs.appendFile('word', worldList, 'utf8', function (err) {
-                        if (err) throw err;
-
-                    });
+                    worldList = words[z].children[0].data + ':' + mean[z].children[0].data;
+                    worldList = JSON.parse(worldList);
+                    // worldList = worldList.replace(/\n/g, '') + '\r\n';
+                    console.log(typeof worldList);
+                    db.save(worldList);
+                    // fs.appendFile('word', worldList, 'utf8', function (err) {
+                    //     if (err) throw err;
+                    // });
                 }
             });
             interval(3500);
@@ -90,3 +92,5 @@ function interval(n) {
         }
     }
 };
+
+getloginCookie();
